@@ -1,0 +1,10 @@
+{
+  "passwords": {
+    "email": "hunter2",
+    "github": "password123"
+  },
+  "PINs": {
+    "bank": "4321",
+    "phone": "1234"
+  }
+}
