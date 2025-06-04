@@ -1,7 +1,7 @@
 import json
 from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY
 import pimoroni
-import machine
+from machine import ADC, Pin
 import time
 
 # Display setup
@@ -28,6 +28,37 @@ path_stack = []
 current_items = []
 selected_index = 0
 
+vsys = ADC(Pin(29))                 # reads the system input voltage
+charging_pin = Pin(24, Pin.IN)          # reading GP24 tells us whether or not USB power is connected
+conversion_factor = 3 * 3.3 / 65535
+
+full_battery = 4.2                  # reference voltages for a full/empty battery, in volts
+empty_battery = 2.8                 # the values could vary by battery size/manufacturer so you might need to adjust them
+mid_battery = (empty_battery + full_battery) / 2
+
+RED    = (200,   0,   0)
+YELLOW = (200, 200,   0)
+GREEN  = (  0, 200,   0)
+
+def read_battery_volts_percentage():
+    # convert the raw ADC read into a voltage, and then a percentage
+    voltage = vsys.read_u16() * conversion_factor
+    percentage = 100 * ((voltage - empty_battery) / (full_battery - empty_battery))
+    if percentage > 100:
+        percentage = 100
+    return voltage, percentage
+
+def lerp(color1, color2, t):
+    r1, g1, b1 = color1
+    r2, g2, b2 = color2
+    return int(r1 * (1 - t) + r2 * t), int(g1 * (1 - t) + g2 * t), int(b1 * (1 - t) + b2 * t)
+
+def battery_color(percentage):
+    if percentage < 50:
+        return lerp(RED, YELLOW, 2 * percentage / 100)
+    else:
+        return lerp(YELLOW, GREEN, 2 * (percentage - 50) / 100)
+    
 # Load data
 def load_data():
     with open("info.json", "r") as f:
@@ -55,16 +86,27 @@ def update_items():
 def draw():
     display.set_pen(BLACK_PEN)
     display.clear()
-    display.set_pen(display.create_pen(255, 255, 255))
+    display.set_pen(WHITE_PEN)
     
     display.set_pen(WHITE_PEN if selected_index > 0 else GRAY_PEN)
-    display.text("More", 0, 15, WIDTH, 2)
+    display.text("Up", 0, 15, WIDTH, 2)
     display.set_pen(WHITE_PEN if selected_index < len(current_items) - 1 else GRAY_PEN)
-    display.text("More", 0, 95, WIDTH, 2)
+    display.text("Down", 0, 95, WIDTH, 2)
     display.set_pen(WHITE_PEN if isinstance(get_current_node(), dict) else GRAY_PEN)
-    display.text("Select", 184, 15, WIDTH, 2)
+    display.text("View", 200, 15, WIDTH, 2)
     display.set_pen(WHITE_PEN if len(path_stack) > 0 else GRAY_PEN)
     display.text("Back", 200, 95, WIDTH, 2)
+
+    voltage, percentage = read_battery_volts_percentage()
+    charging = " (charging)" if charging_pin() else ""
+    
+    color = battery_color(percentage)
+    pen = display.create_pen(*color)
+    display.set_pen(pen)
+
+    battery_text = f"Bat: {voltage:.1f}V/{int(percentage)}%{charging}"
+    width = display.measure_text(battery_text, scale=2)
+    display.text(battery_text, (WIDTH - width) // 2, 115, WIDTH, 2)
 
     display.set_pen(WHITE_PEN)
 
@@ -88,6 +130,8 @@ def main():
     draw()
 
     while True:
+        draw()
+        
         if not BUTTON_A.value():
             if selected_index > 0:
                 selected_index -= 1
@@ -119,5 +163,7 @@ def main():
             wait_for_button_release()
 
         time.sleep(0.05)
+
+machine.freq(48_000_000)
 
 main()
