@@ -1,4 +1,6 @@
 # Password Keeper
 A gadget to store passwords, PINs, short notes etc.
 
-![ddd](IMG_0969.jpg)
+![](IMG_0973.JPEG)
+![](IMG_0974.JPEG)
+![](IMG_0976.JPEG)
