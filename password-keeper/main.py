@@ -36,9 +36,13 @@ full_battery = 4.2                  # reference voltages for a full/empty batter
 empty_battery = 2.8                 # the values could vary by battery size/manufacturer so you might need to adjust them
 mid_battery = (empty_battery + full_battery) / 2
 
-RED    = (200,   0,   0)
-YELLOW = (200, 200,   0)
-GREEN  = (  0, 200,   0)
+RED    = (150,   0,   0)
+YELLOW = (150, 150,   0)
+GREEN  = (  0, 150,   0)
+
+CHARGING_RED    = (200,   0,   0)
+CHARGING_YELLOW = (200, 200,   0)
+CHARGING_GREEN  = (  0, 200,   0)
 
 def read_battery_volts_percentage():
     # convert the raw ADC read into a voltage, and then a percentage
@@ -54,10 +58,16 @@ def lerp(color1, color2, t):
     return int(r1 * (1 - t) + r2 * t), int(g1 * (1 - t) + g2 * t), int(b1 * (1 - t) + b2 * t)
 
 def battery_color(percentage):
-    if percentage < 50:
-        return lerp(RED, YELLOW, 2 * percentage / 100)
+    if charging_pin.value() == 1:
+        if percentage < 50:
+            return lerp(CHARGING_RED, CHARGING_YELLOW, 2 * percentage / 100)
+        else:
+            return lerp(CHARGING_YELLOW, CHARGING_GREEN, 2 * (percentage - 50) / 100)
     else:
-        return lerp(YELLOW, GREEN, 2 * (percentage - 50) / 100)
+        if percentage < 50:
+            return lerp(RED, YELLOW, 2 * percentage / 100)
+        else:
+            return lerp(YELLOW, GREEN, 2 * (percentage - 50) / 100)
     
 # Load data
 def load_data():
@@ -98,13 +108,12 @@ def draw():
     display.text("Back", 200, 95, WIDTH, 2)
 
     voltage, percentage = read_battery_volts_percentage()
-    charging = " (charging)" if charging_pin() else ""
     
     color = battery_color(percentage)
     pen = display.create_pen(*color)
     display.set_pen(pen)
 
-    battery_text = f"Bat: {voltage:.1f}V/{int(percentage)}%{charging}"
+    battery_text = f"Bat: {voltage:.1f}V / {int(percentage)}%"
     width = display.measure_text(battery_text, scale=2)
     display.text(battery_text, (WIDTH - width) // 2, 115, WIDTH, 2)
 
