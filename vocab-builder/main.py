@@ -30,7 +30,7 @@ def draw_ui_labels():
     display.set_font("bitmap6")
     display.text("Next", 290, 28, scale=1, angle=270)
     display.text("Define", 290, 75, scale=1, angle=270)
-    display.text("Sleep", 290, 117, scale=1, angle=270)
+    display.text("Remove", 290, 123, scale=1, angle=270)
 
 def clear_screen():
     display.set_pen(15)  # White background
@@ -58,7 +58,7 @@ def wait_for_input():
         elif button_b.read():
             return "define"
         elif button_c.read():
-            return "sleep"
+            return "remove"
         time.sleep(0.1)
 
 # Main loop
@@ -81,7 +81,8 @@ while True:
             else:
                 show_word(entry)
 
-        elif action == "sleep":
-            clear_screen()
-            display.update()
+        elif action == "remove":
+            vocab_list.remove(entry)
+            with open(VOCABULARY_FILE_NAME, "w") as f:
+                ujson.dump(vocab_list, f)
             break
