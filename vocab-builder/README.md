@@ -17,13 +17,11 @@ A flashcard-style vocabulary gadget for learning and reviewing English words.
 ## Hardware
 
 - [Pimoroni Pico LiPo](https://shop.pimoroni.com/products/pico-lipo-16mb)  
-  or compatible RP2040 board with:
-  - Display (e.g. Pico Display or Inky)
-  - Three buttons
+- [Pimoroni Pico Inky Pack](https://shop.pimoroni.com/products/pico-inky-pack)
 
 ## File Format
 
-Vocabulary is stored in a `vocab.json` file. Each entry is a dictionary with a `word`, a `definition`, and an optional `known` flag.
+Vocabulary is stored in a `vocab.json` file. Each entry is a dictionary with a `word`, a `definition`.
 
 ```json
 [
