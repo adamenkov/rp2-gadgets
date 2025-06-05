@@ -61,6 +61,8 @@ def wait_for_input():
             return "remove"
         time.sleep(0.1)
 
+machine.freq(48_000_000)
+
 # Main loop
 while True:
     entry = random.choice(vocab_list)
