@@ -25,6 +25,15 @@ Vocabulary is stored in a `vocab.json` file. Each entry is a dictionary with a `
 
 ```json
 [
-  { "word": "eloquent", "definition": "fluent or persuasive in speaking or writing" },
-  { "word": "succinct", "definition": "briefly and clearly expressed" }
+    {
+        "word": "abstruse",
+        "definition": "difficult to understand; obscure",
+        "example": "The professor's lectures were so abstruse that students often left confused."
+    },
+    {
+        "word": "bellicose",
+        "definition": "demonstrating aggression and willingness to fight",
+        "example": "His bellicose behavior at the meeting annoyed everyone."
+    }
 ]
+```
