@@ -21,7 +21,7 @@ A flashcard-style vocabulary gadget for learning and reviewing English words.
 
 ## File Format
 
-Vocabulary is stored in a `vocab.json` file. Each entry is a dictionary with a `word`, a `definition`.
+Vocabulary is stored in a `vocab.json` file. Each entry is a dictionary with a `word`, a `definition`, and an `example`.
 
 ```json
 [
