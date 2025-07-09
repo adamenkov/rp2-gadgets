@@ -6,6 +6,8 @@ A collection of small, self-contained MicroPython gadgets designed for the [Pimo
 
 ### 🔐 Password Keeper
 
+![](password-keeper/IMG_0973.JPEG)
+
 Securely stores passwords, PINs, and keys in a local JSON file. Designed for offline use — no connectivity or syncing required (or desired).
 
 - View one entry at a time
@@ -15,7 +17,7 @@ Securely stores passwords, PINs, and keys in a local JSON file. Designed for off
 
 ### 🧠 Vocabulary Builder
 
-![](password-keeper/IMG_0973.JPEG)
+![](vocab-builder/IMG_0978.JPEG)
 
 A flashcard-style tool for learning English vocabulary.
 
