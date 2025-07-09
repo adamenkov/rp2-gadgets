@@ -15,6 +15,8 @@ Securely stores passwords, PINs, and keys in a local JSON file. Designed for off
 
 ### 🧠 Vocabulary Builder
 
+![](password-keeper/IMG_0973.JPEG)
+
 A flashcard-style tool for learning English vocabulary.
 
 - Browse and review word-definition pairs
