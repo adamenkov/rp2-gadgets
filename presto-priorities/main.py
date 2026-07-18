@@ -1,7 +1,8 @@
 from machine import RTC
 from micropython import const
+import ntptime
 from presto import Presto
-from time import sleep, sleep_ms, ticks_diff, ticks_ms
+from time import sleep, sleep_ms, ticks_diff, ticks_ms, gmtime, time
 from touch import Button
 
 
@@ -57,7 +58,6 @@ CONTENT_HEIGHT = HEIGHT - HEADER_HEIGHT - FOOTER_HEIGHT
 CELL_WIDTH = WIDTH // 2
 CELL_HEIGHT = CONTENT_HEIGHT // 2
 
-
 BLACK = display.create_pen(0, 0, 0)
 GRAY = display.create_pen(30, 30, 30)
 BLUE = display.create_pen(0, 0, 127)
@@ -66,6 +66,42 @@ CYAN = display.create_pen(0, 127, 127)
 YELLOW = display.create_pen(127, 127, 0)
 WHITE = display.create_pen(127, 127, 127)
 
+# Clear the screen before the network call is made
+display.set_pen(BLACK)
+display.clear()
+presto.update()
+
+def show_message(text):
+    display.set_pen(BLACK)
+    display.clear()
+    display.set_pen(WHITE)
+    display.text(f"{text}", 5, 10, WIDTH, 2)
+    presto.update()
+
+show_message("Fetching current time...")
+
+try:
+    wifi = presto.connect()
+except ValueError as e:
+    while True:
+        show_message(e)
+except ImportError as e:
+    while True:
+        show_message(e)
+
+# Set the correct time using the NTP service.
+try:
+    ntptime.settime()
+except OSError:
+    while True:
+        show_message("Unable to get time.\n\nCheck your network\nand try again.")
+
+UTC_OFFSET_HOURS = const(-5)  # Change to -6 in winter
+
+def local_datetime():
+    local = gmtime(time() + UTC_OFFSET_HOURS * 60 * 60)
+    year, month, day, hour, minute, second, weekday, _ = local
+    return year, month, day, weekday, hour, minute, second, 0
 
 MENU = (
     MenuItem(
@@ -180,7 +216,7 @@ draw_grid()
 
 selected_item = None
 
-current_datetime = rtc.datetime()
+current_datetime = local_datetime()
 displayed_status = current_datetime[:6]
 last_clock_check = ticks_ms()
 
@@ -217,7 +253,7 @@ while True:
 
     if ticks_diff(now, last_clock_check) >= CLOCK_CHECK_MS:
         last_clock_check = now
-        current_datetime = rtc.datetime()
+        current_datetime = local_datetime()
         status = current_datetime[:6]
 
         if status != displayed_status:
